@@ -931,6 +931,45 @@ std::pair<Values, double> ShonanAveraging<d>::run(const Values &initialEstimate,
 }
 
 /* ************************************************************************* */
+template <size_t d>
+std::pair<Values, double> ShonanAveraging<d>::runAP(const Values &initialEstimate,
+                                                  size_t pMin,
+                                                  size_t pMax) const {
+  Values Qstar;
+  Values initialSOp = LiftTo<Rot>(pMin, initialEstimate);  // lift to pMin!
+  for (size_t p = pMin; p <= pMax; p++) {
+    // Optimize until convergence at this level
+    Qstar = tryOptimizingAt(p, initialSOp);
+    if (parameters_.getUseHuber() || !parameters_.getCertifyOptimality()) {
+      // in this case, there is no optimality certification
+      if (pMin != pMax) {
+        throw std::runtime_error(
+            "When using robust norm, Shonan only tests a single rank. Set pMin = pMax");
+      }
+      const Values SO3Values = roundSolution(Qstar);
+      return std::make_pair(SO3Values, 0);
+    } else {
+      // Check certificate of global optimality
+      Vector minEigenVector;
+      double minEigenValue = computeMinEigenValueAP(Qstar, &minEigenVector);
+      if (minEigenValue > parameters_.optimalityThreshold) {
+        // If at global optimum, round and return solution
+        const Values SO3Values = roundSolution(Qstar);
+        return std::make_pair(SO3Values, minEigenValue);
+      }
+
+      // Not at global optimimum yet, so check whether we will go to next level
+      if (p != pMax) {
+        // Calculate initial estimate for next level by following minEigenVector
+        initialSOp =
+            initializeWithDescent(p + 1, Qstar, minEigenVector, minEigenValue);
+      }
+    }
+  }
+  throw std::runtime_error("Shonan::runAP did not converge for given pMax");
+}
+
+/* ************************************************************************* */
 // Explicit instantiation for d=2
 template class ShonanAveraging<2>;
 

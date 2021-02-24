@@ -402,6 +402,18 @@ class GTSAM_EXPORT ShonanAveraging {
    */
   std::pair<Values, double> run(const Values &initialEstimate, size_t pMin = d,
                                 size_t pMax = 10) const;
+
+  /**
+   * Optimize at different values of p until convergence,
+   * use the power/accelerated power iteration for computing
+   * the minimum eigen value and eigen vector.
+   * @param initial initial Rot3 values
+   * @param pMin value of p to start Riemanian staircase at (default: d).
+   * @param pMax maximum value of p to try (default: 10)
+   * @return (Rot3 values, minimum eigenvalue)
+   */
+  std::pair<Values, double> runAP(const Values &initialEstimate, size_t pMin = d,
+                                size_t pMax = 10) const;
   /// @}
 
   /**
