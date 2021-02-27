@@ -237,6 +237,15 @@ TEST(ShonanAveraging3, run) {
 }
 
 /* ************************************************************************* */
+TEST(ShonanAveraging3, runAP) {
+  auto initial = kShonan.initializeRandomly(kRandomNumberGenerator); 
+  auto result = kShonan.runAP(initial, 5);
+  EXPECT_DOUBLES_EQUAL(0, kShonan.cost(result.first), 1e-3);
+  EXPECT_DOUBLES_EQUAL(-5.427688831332745e-07, result.second,
+                       1e-4); // Regression test
+}
+
+/* ************************************************************************* */
 namespace klaus {
 // The data in the file is the Colmap solution
 const Rot3 wR0(0.9992281076190063, -0.02676080288219576, -0.024497002638379624,
