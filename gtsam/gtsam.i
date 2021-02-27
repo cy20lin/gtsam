@@ -3030,6 +3030,7 @@ class ShonanAveraging3 {
   Matrix computeLambda_(const gtsam::Values& values) const;
   Matrix computeA_(const gtsam::Values& values) const;
   double computeMinEigenValue(const gtsam::Values& values) const;
+  double computeMinEigenValueAP(const gtsam::Values& values) const;
   gtsam::Values initializeWithDescent(size_t p, const gtsam::Values& values,
                                const Vector& minEigenVector, double minEigenValue) const;
 
@@ -3049,6 +3050,7 @@ class ShonanAveraging3 {
   double cost(const gtsam::Values& values) const;
   gtsam::Values initializeRandomly() const;
   pair<gtsam::Values, double> run(const gtsam::Values& initial, size_t min_p, size_t max_p) const;
+  pair<gtsam::Values, double> runAP(const gtsam::Values& initial, size_t min_p, size_t max_p) const;
 };
 
 #include <gtsam/sfm/MFAS.h>
